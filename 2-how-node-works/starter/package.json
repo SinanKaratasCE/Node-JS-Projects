@@ -1,0 +1,12 @@
+{
+  "name": "starter",
+  "version": "1.0.0",
+  "main": "eventloop.js",
+  "scripts": {
+    "start": "set UV_THREADPOOL_SIZE=2 & node eventloop.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
