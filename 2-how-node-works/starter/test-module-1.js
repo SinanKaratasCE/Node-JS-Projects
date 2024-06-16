@@ -12,7 +12,7 @@
 //   }
 // }
 
-module.exports = class Calculator {
+module.exports = class{
   add(a, b) {
     return a + b;
   }
