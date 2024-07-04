@@ -1,9 +1,44 @@
 const Tour = require(`./../models/tourModel`);
 
 exports.gettAllTours = async (req, res) => {
-  const tours = await Tour.find();
-
   try {
+    //BUILD QUERY
+    // 1A) Filtering
+    const queryObj = {
+      ...req.query,
+    };
+    const excludedFields = [`page`, `sort`, `limit`, `fields`];
+    excludedFields.forEach((el) => delete queryObj[el]);
+
+    // 1B) Advanced Filtering
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+
+    // {difficulty: `easy}, duration: {$gte: 5}}
+    // { difficulty: 'easy', duration: { gte: '5' } }
+    //gte, gt, lte, lt
+
+    let query = Tour.find(JSON.parse(queryStr));
+
+    // 2) Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(`,`).join(` `);
+      query = query.sort(sortBy);
+      //sort(`price ratingsAverage`)
+    }else
+    {
+      query = query.sort(`-createdAt`);
+    }
+    //EXECUTE QUERY
+    const tours = await query;
+
+    // const query = Tour.find()
+    //   .where(`duration`)
+    //   .equals(5)
+    //   .where(`difficulty`)
+    //   .equals(`easy`);
+
+    //SEND RESPONSE
     res.status(200).json({
       status: `success`,
       results: tours.length,
@@ -35,7 +70,7 @@ exports.createNewTour = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: `fail`,
-      message: `Invalid data sent!`,
+      message: err,
     });
   }
 };
